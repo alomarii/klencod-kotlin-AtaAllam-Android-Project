@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>أتعلم وأستمتع</title>
+<style>
+:root{--primary:#4f46e5;--secondary:#06b6d4;--background:#f1f5f9;--surface:#fff;--text:#172033;--muted:#64748b;--success:#16a34a;--danger:#dc2626;--border:#e2e8f0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--background);color:var(--text);font-family:'Noto Naskh Arabic','Noto Sans Arabic',Roboto,Arial,sans-serif;transition:background .25s;-webkit-user-select:none;user-select:none}
+body.dark{--background:#111827;--surface:#1f2937;--text:#f8fafc;--muted:#cbd5e1;--border:#374151}
+body.contrast{--background:#000;--surface:#111;--text:#fff;--primary:#ffe600;--secondary:#00ffff;--border:#fff}
+body.contrast button{color:#000}
+body.large{font-size:1.2rem}
+body.age-small .lesson-card{min-height:150px;font-size:1.2em}
+button,input{font:inherit}
+button{border:0;border-radius:14px;padding:10px 15px;cursor:pointer;background:var(--primary);color:#fff}
+button:active{transform:scale(.96)}
+button:disabled{opacity:.65}
+button.secondary{background:#64748b;color:#fff}
+button.success{background:var(--success);color:#fff}
+button.danger{background:var(--danger);color:#fff}
+button.light{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+header{padding:16px;color:#fff;text-align:center;background:linear-gradient(135deg,var(--primary),var(--secondary))}
+body.contrast header{color:#000}
+header h1{margin:0 0 4px;font-size:1.5em}
+#greeting{margin:0 0 10px;opacity:.95}
+.stats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.stat{background:#ffffff33;border-radius:20px;padding:5px 12px;font-size:.9em}
+.toolbar,nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:7px;padding:9px;background:var(--surface);border-bottom:1px solid var(--border)}
+.toolbar button,nav button{padding:7px 11px;font-size:.85em;background:#64748b;color:#fff}
+nav button.active{background:var(--primary)}
+body.contrast nav button.active{color:#000}
+main{max-width:1100px;margin:auto;padding:14px}
+.section{display:none;animation:show .3s}
+.section.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 4px 15px #0000000f}
+.hero{text-align:center;padding:36px 16px}
+.hero h2{font-size:1.8em;margin:0 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:11px}
+.lesson-card{min-height:112px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;background:#e0f2fe;color:#172033;border-radius:18px;font-size:1.05em}
+.lesson-card strong{color:#3730a3;font-size:2.2em}
+.lesson-card small{font-size:.85em}
+.dark .lesson-card{background:#334155;color:#fff}
+.dark .lesson-card strong{color:#a5b4fc}
+.contrast .lesson-card{background:#222;color:#fff}
+.contrast .lesson-card strong{color:#ffe600}
+.progress{height:20px;background:#cbd5e1;border-radius:20px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--success);transition:width .4s}
+.badge{text-align:center;padding:16px;border-radius:18px;background:#cbd5e1;color:#172033;opacity:.45}
+.badge.unlocked{opacity:1;background:#fef3c7;color:#713f12}
+.correct{background:#bbf7d0!important;color:#14532d!important}
+.wrong{background:#fecaca!important;color:#7f1d1d!important}
+#canvas{width:100%;height:280px;background:#fff;border:3px dashed var(--primary);border-radius:15px;touch-action:none;display:block}
+.question-option{width:100%;margin:5px 0;text-align:right;font-size:1.1em}
+.ayah{width:100%;margin-bottom:8px;background:#ecfeff;color:#164e63;text-align:right;font-size:1.3em;line-height:2}
+.dark .ayah{background:#164e63;color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input[type=text],input[type=password]{padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);-webkit-user-select:text;user-select:text;width:100%;max-width:280px}
+.notice{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:none;padding:11px 18px;border-radius:12px;color:#fff;background:#111827;z-index:40;max-width:90%;text-align:center}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0009;z-index:35;padding:16px}
+.modal-box{width:min(450px,100%);max-height:92vh;overflow:auto;background:var(--surface);color:var(--text);border-radius:20px;padding:20px}
+.age-screen{position:fixed;inset:0;z-index:50;display:none;justify-content:center;align-items:center;color:#fff;text-align:center;background:linear-gradient(135deg,#4f46e5,#06b6d4);overflow:auto}
+.age-box{width:min(520px,90%)}
+.age-box button{margin:5px;background:#fff;color:#3730a3}
+.hidden{display:none!important}
+.memgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.memcard{height:78px;font-size:2em;padding:0;background:var(--primary);color:#fff}
+.memcard.open{background:#e0f2fe;color:#172033}
+.memcard.done{background:#bbf7d0;color:#14532d}
+@keyframes show{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(max-width:600px){main{padding:9px}.card{padding:13px}header h1{font-size:1.25em}.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="ageScreen" class="age-screen">
+ <div class="age-box">
+  <h1>🌟 أتعلم وأستمتع 🌟</h1>
+  <p>ما اسمك يا بطل؟</p>
+  <input id="nameInput" type="text" maxlength="20" placeholder="اكتب اسمك">
+  <p>اختر الفئة العمرية للبدء</p>
+  <button onclick="chooseAge('small')">👶 الصغار</button>
+  <button onclick="chooseAge('medium')">🧒 المتوسطون</button>
+  <button onclick="chooseAge('large')">👦 الكبار</button>
+ </div>
+</div>
+
+<header>
+ <h1>🌟 أتعلم وأستمتع 🌟</h1>
+ <p id="greeting"></p>
+ <div class="stats">
+  <span class="stat">⭐ النجوم: <b id="stars">0</b></span>
+  <span class="stat">📚 الأنشطة: <b id="activities">0</b></span>
+  <span class="stat">🏆 المستوى: <b id="level">مبتدئ</b></span>
+  <span class="stat">🔥 الأيام: <b id="streak">0</b></span>
+ </div>
+</header>
+
+<div class="toolbar">
+ <button onclick="toggleSound()">🔊 <span id="soundLabel">الصوت يعمل</span></button>
+ <button onclick="toggleTheme('large')">🔠 حجم النص</button>
+ <button onclick="toggleTheme('contrast')">◐ التباين</button>
+ <button onclick="toggleTheme('dark')">🌙 المظهر</button>
+ <button onclick="openParents()">👨‍👩‍👧 الوالدين</button>
+</div>
+
+<nav id="nav">
+ <button data-s="home" class="active">الرئيسية</button>
+ <button data-s="alphabet">الحروف</button>
+ <button data-s="numbers">الأرقام</button>
+ <button data-s="writing">الكتابة</button>
+ <button data-s="quran">القرآن</button>
+ <button data-s="games">الألعاب</button>
+ <button data-s="quiz">الاختبار</button>
+ <button data-s="badges">الشارات</button>
+</nav>
+
+<main>
+<section id="home" class="section active">
+ <div class="card hero">
+  <h2 id="heroTitle">مرحبًا يا بطل! 🎈</h2>
+  <p>تعلم الحروف والأرقام، وارسم، والعب، واختبر معلوماتك، واجمع النجوم.</p>
+  <div class="row" style="justify-content:center">
+   <button onclick="showSection('alphabet')">ابدأ بالحروف</button>
+   <button class="success" onclick="showSection('quiz')">ابدأ الاختبار</button>
+  </div>
+ </div>
+ <div class="card">
+  <h2>📌 هدف اليوم</h2>
+  <p id="dailyMessage"></p>
+  <div class="progress"><span id="dailyProgress" style="width:0%"></span></div>
+ </div>
+</section>
+
+<section id="alphabet" class="section">
+ <div class="card"><h2>🔤 الحروف العربية</h2><p>اضغط على الحرف لسماع اسمه وكلمته.</p><div id="alphabetGrid" class="grid"></div></div>
+</section>
+
+<section id="numbers" class="section">
+ <div class="card"><h2>🔢 الأرقام</h2><div id="numbersGrid" class="grid"></div></div>
+</section>
+
+<section id="writing" class="section">
+ <div class="card">
+  <h2>✍️ الكتابة والرسم</h2>
+  <h3 id="writingPrompt"></h3>
+  <div class="row">
+   <label>لون القلم: <input id="penColor" type="color" value="#4f46e5"></label>
+   <label>حجم القلم: <input id="penSize" type="range" min="3" max="30" value="12"></label>
+  </div><br>
+  <canvas id="canvas" width="900" height="320"></canvas><br>
+  <button onclick="finishDrawing()">✅ انتهيت</button>
+  <button class="secondary" onclick="clearCanvas()">🧹 مسح</button>
+  <button class="light" onclick="newPrompt()">➡️ تدريب آخر</button>
+ </div>
+</section>
+
+<section id="quran" class="section">
+ <div class="card">
+  <h2>📖 القرآن الكريم</h2>
+  <div id="surahList" class="grid"></div>
+  <div id="surahDetail" class="hidden">
+   <h3 id="surahTitle"></h3>
+   <div id="ayahList"></div>
+   <button onclick="readFullSurah()">🔊 قراءة السورة</button>
+   <button class="secondary" onclick="closeSurah()">↩️ العودة</button>
+  </div>
+ </div>
+</section>
+
+<section id="games" class="section">
+ <div class="card">
+  <h2>🃏 لعبة الذاكرة</h2>
+  <p>اقلب البطاقات وابحث عن كل صورتين متشابهتين. المحاولات: <b id="memMoves">0</b></p>
+  <div id="memGrid" class="memgrid"></div><br>
+  <button onclick="startMemory()">🔄 لعبة جديدة</button>
+ </div>
+</section>
+
+<section id="quiz" class="section">
+ <div class="card">
+  <h2>🧠 الاختبار</h2>
+  <div id="quizBox"><p>أجب عن الأسئلة لتحصل على النجوم.</p><button onclick="startQuiz()">ابدأ الاختبار</button></div>
+ </div>
+ <div class="card"><h3>🔁 مراجعة الأخطاء</h3><div id="mistakesBox"></div></div>
+</section>
+
+<section id="badges" class="section">
+ <div class="card"><h2>🏅 الشارات والإنجازات</h2><div id="badgesGrid" class="grid"></div></div>
+</section>
+</main>
+
+<div id="notice" class="notice"></div>
+
+<div id="parentModal" class="modal">
+ <div class="modal-box">
+  <h2>لوحة الوالدين</h2>
+  <div id="pinStep">
+   <p id="pinHint">أدخل الرمز السري.</p>
+   <input id="pinInput" type="password" inputmode="numeric" maxlength="8" placeholder="الرمز السري"><br><br>
+   <button onclick="checkPin()">دخول</button>
+   <button class="secondary" onclick="closeModal()">إغلاق</button>
+  </div>
+  <div id="parentData" class="hidden">
+   <p>👤 الاسم: <b id="pName"></b></p>
+   <p>⭐ النجوم: <b id="pStars"></b></p>
+   <p>📚 الأنشطة: <b id="pActivities"></b></p>
+   <p>🧠 آخر اختبار: <b id="pQuiz"></b></p>
+   <p>✅ الصحيحة: <b id="pCorrect"></b> &nbsp; ❌ الخاطئة: <b id="pWrong"></b></p>
+   <p>🔥 الأيام المتتالية: <b id="pStreak"></b></p>
+   <hr>
+   <p>تغيير اسم الطفل:</p>
+   <input id="newName" type="text" maxlength="20" placeholder="الاسم الجديد">
+   <button onclick="saveName()">حفظ</button>
+   <p>تغيير الرمز السري (٤ أرقام على الأقل):</p>
+   <input id="newPin" type="password" inputmode="numeric" maxlength="8" placeholder="رمز جديد">
+   <button onclick="savePin()">حفظ</button>
+   <hr>
+   <button onclick="exportData()">⬇️ مشاركة التقدم</button>
+   <button onclick="document.getElementById('importFile').click()">⬆️ استيراد التقدم</button>
+   <input id="importFile" type="file" accept=".json,application/json,text/plain" hidden>
+   <br><br>
+   <button class="danger" onclick="resetProgress()">حذف التقدم</button>
+   <button class="secondary" onclick="closeModal()">إغلاق</button>
+  </div>
+ </div>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const AR=['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+const ar=n=>String(n).replace(/\d/g,d=>AR[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+const letters=[
+ ['ا','أسد','🦁'],['ب','بطة','🦆'],['ت','تفاحة','🍎'],['ث','ثعلب','🦊'],
+ ['ج','جمل','🐪'],['ح','حصان','🐴'],['خ','خروف','🐑'],['د','دب','🐻'],
+ ['ذ','ذهب','🥇'],['ر','راديو','📻'],['ز','زهرة','🌸'],['س','سمكة','🐟'],
+ ['ش','شمس','☀️'],['ص','صقر','🦅'],['ض','ضفدع','🐸'],['ط','طائرة','✈️'],
+ ['ظ','ظرف','✉️'],['ع','عنب','🍇'],['غ','غزال','🦌'],['ف','فراشة','🦋'],
+ ['ق','قمر','🌙'],['ك','كتاب','📘'],['ل','ليمون','🍋'],['م','موز','🍌'],
+ ['ن','نحلة','🐝'],['ه','هاتف','📱'],['و','وردة','🌹'],['ي','يد','✋']
+];
+const numWords=['واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة'];
+
+const surahs={
+ 'الفاتحة':['بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ','الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ','الرَّحْمَٰنِ الرَّحِيمِ','مَالِكِ يَوْمِ الدِّينِ','إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ','اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ','صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ'],
+ 'الإخلاص':['قُلْ هُوَ اللَّهُ أَحَدٌ','اللَّهُ الصَّمَدُ','لَمْ يَلِدْ وَلَمْ يُولَدْ','وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ'],
+ 'الفلق':['قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ','مِنْ شَرِّ مَا خَلَقَ','وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ','وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ','وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ'],
+ 'الناس':['قُلْ أَعُوذُ بِرَبِّ النَّاسِ','مَلِكِ النَّاسِ','إِلَٰهِ النَّاسِ','مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ','الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ','مِنَ الْجِنَّةِ وَالنَّاسِ'],
+ 'الكوثر':['إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ','فَصَلِّ لِرَبِّكَ وَانْحَرْ','إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ']
+};
+
+const staticQuestions=[
+ {q:'كم عدد أصابع اليد الواحدة؟',o:['٣','٥','١٠'],a:'٥'},
+ {q:'أي حيوان يقول مواء؟',o:['قطة','كلب','حصان'],a:'قطة'},
+ {q:'ما لون الشمس؟',o:['أزرق','أصفر','أخضر'],a:'أصفر'},
+ {q:'ما لون العشب؟',o:['أخضر','أحمر','أسود'],a:'أخضر'},
+ {q:'ماذا نرى في السماء ليلًا؟',o:['القمر','الشمس','السمكة'],a:'القمر'}
+];
+const prompts=['ارسم شمسًا ☀️','اكتب حرف الألف','ارسم بيتًا 🏠','اكتب اسمك','ارسم زهرة 🌸','ارسم قمرًا 🌙','اكتب الرقم ٥'];
+
+const defaultState={name:'',age:'medium',setup:false,pin:'1234',stars:0,activities:0,today:0,goalDate:'',
+ lastQuiz:'لا يوجد',correct:0,wrong:0,streak:0,lastDate:'',mistakes:[],sound:true,dark:false,contrast:false,large:false,perfect:0,memWins:0,drawings:0};
+let state=Object.assign({},defaultState);
+let currentSection='home',quiz=[],quizIndex=0,quizScore=0,currentSurah='',drawing=false,hasDrawn=false,noticeTimer=null;
+const GOAL=10;
+
+function dateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+const today=()=>dateStr(new Date());
+const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return dateStr(d)};
+
+function saveState(){try{localStorage.setItem('learningState',JSON.stringify(state))}catch(e){}}
+function loadState(){
+ try{const s=localStorage.getItem('learningState');if(s)state=Object.assign({},defaultState,JSON.parse(s))}catch(e){state=Object.assign({},defaultState)}
+ if(!Array.isArray(state.mistakes))state.mistakes=[];
+ if(state.lastDate!==today()){
+  state.streak=state.lastDate===yesterday()?state.streak+1:1;
+  state.lastDate=today();state.today=0;saveState();
+ }
+}
+
+function speak(text){
+ if(!state.sound)return;
+ try{
+  if(window.Android&&Android.canSpeak&&Android.canSpeak()){Android.speak(text);return}
+  if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='ar-SA';u.rate=.85;speechSynthesis.speak(u)}
+ }catch(e){}
+}
+function showNotice(msg){
+ const n=$('notice');n.textContent=msg;n.style.display='block';
+ clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{n.style.display='none'},2200);
+}
+function addStars(amount,msg){
+ state.stars+=amount;state.activities++;state.today++;
+ let text=(msg||'أحسنت!')+' حصلت على '+ar(amount)+' نجوم ⭐';
+ if(state.today>=GOAL&&state.goalDate!==today()){state.goalDate=today();state.stars+=10;text+=' 🎯 أكملت هدف اليوم! +١٠ نجوم'}
+ saveState();updateAll();showNotice(text);
+}
+
+function applyTheme(){
+ const c=document.body.classList;
+ c.toggle('dark',!!state.dark);c.toggle('contrast',!!state.contrast);c.toggle('large',!!state.large);
+ c.toggle('age-small',state.age==='small');
+ $('soundLabel').textContent=state.sound?'الصوت يعمل':'الصوت متوقف';
+}
+function toggleTheme(k){state[k]=!state[k];saveState();applyTheme()}
+function toggleSound(){state.sound=!state.sound;saveState();applyTheme()}
+
+function chooseAge(mode){
+ state.age=mode;state.setup=true;
+ state.name=$('nameInput').value.trim().slice(0,20);
+ saveState();applyTheme();updateAll();
+ $('ageScreen').style.display='none';
+}
+
+function showSection(id){
+ currentSection=id;
+ document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+ $(id).classList.add('active');
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===id));
+ window.scrollTo(0,0);
+ if(id==='games'&&!mem.cards.length)startMemory();
+}
+
+function updateAll(){
+ $('stars').textContent=ar(state.stars);
+ $('activities').textContent=ar(state.activities);
+ $('streak').textContent=ar(state.streak);
+ $('level').textContent=state.stars>=200?'خبير':state.stars>=100?'محترف':state.stars>=50?'مجتهد':'مبتدئ';
+ const nm=state.name;
+ $('greeting').textContent=nm?'أهلًا '+nm+'!':'';
+ $('heroTitle').textContent=nm?'مرحبًا يا '+nm+'! 🎈':'مرحبًا يا بطل! 🎈';
+ $('dailyProgress').style.width=Math.min(state.today/GOAL*100,100)+'%';
+ $('dailyMessage').textContent=state.today>=GOAL?'رائع! أكملت هدف اليوم 🔥':'أنجز '+ar(Math.max(GOAL-state.today,0))+' أنشطة لتكمل هدف اليوم ('+ar(state.today)+'/'+ar(GOAL)+').';
+ updateBadges();updateMistakes();
+}
+
+/* Letters & numbers */
+function buildLetters(){
+ const g=$('alphabetGrid');g.innerHTML='';
+ letters.forEach((x,i)=>{
+  const b=document.createElement('button');b.className='lesson-card';b.dataset.i=i;
+  b.innerHTML='<strong></strong><span></span><small></small>';
+  b.children[0].textContent=x[0];b.children[1].textContent=x[2];b.children[2].textContent=x[1];
+  g.appendChild(b);
+ });
+ g.onclick=e=>{const b=e.target.closest('button');if(!b)return;const x=letters[b.dataset.i];speak('حرف '+x[0]+' مثل '+x[1]);addStars(5,'تعلمت حرفًا جديدًا!')};
+}
+function buildNumbers(){
+ const g=$('numbersGrid');g.innerHTML='';
+ numWords.forEach((w,i)=>{
+  const b=document.createElement('button');b.className='lesson-card';b.dataset.i=i;
+  b.innerHTML='<strong></strong><small></small>';
+  b.children[0].textContent=ar(i+1);b.children[1].textContent=w;g.appendChild(b);
+ });
+ g.onclick=e=>{const b=e.target.closest('button');if(!b)return;speak(numWords[b.dataset.i]);addStars(5,'تعلمت رقمًا جديدًا!')};
+}
+
+/* Drawing */
+function setupCanvas(){
+ const canvas=$('canvas'),ctx=canvas.getContext('2d');
+ const pos=ev=>{const r=canvas.getBoundingClientRect(),p=ev.touches?ev.touches[0]:ev;return{x:(p.clientX-r.left)*canvas.width/r.width,y:(p.clientY-r.top)*canvas.height/r.height}};
+ const start=ev=>{drawing=true;hasDrawn=true;const p=pos(ev);ctx.beginPath();ctx.moveTo(p.x,p.y);ev.preventDefault()};
+ const move=ev=>{if(!drawing)return;const p=pos(ev);ctx.lineTo(p.x,p.y);ctx.strokeStyle=$('penColor').value;ctx.lineWidth=$('penSize').value;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();ev.preventDefault()};
+ const stop=()=>{drawing=false};
+ canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);
+ canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+ canvas.addEventListener('touchstart',start,{passive:false});
+ canvas.addEventListener('touchmove',move,{passive:false});
+ canvas.addEventListener('touchend',stop);canvas.addEventListener('touchcancel',stop);
+}
+function clearCanvas(){const c=$('canvas');c.getContext('2d').clearRect(0,0,c.width,c.height);hasDrawn=false}
+function finishDrawing(){
+ if(!hasDrawn){showNotice('ارسم شيئًا أولًا ✍️');return}
+ state.drawings++;addStars(10,'عمل رائع في الرسم!');clearCanvas();
+}
+function newPrompt(){$('writingPrompt').textContent=prompts[Math.floor(Math.random()*prompts.length)];clearCanvas()}
+
+/* Quran */
+function buildSurahs(){
+ const l=$('surahList');l.innerHTML='';
+ Object.keys(surahs).forEach(name=>{
+  const b=document.createElement('button');b.className='lesson-card';b.dataset.name=name;
+  b.innerHTML='<strong>📖</strong><small>سورة</small><b></b>';b.children[2].textContent=name;l.appendChild(b);
+ });
+ l.onclick=e=>{const b=e.target.closest('button');if(b)openSurah(b.dataset.name)};
+}
+function openSurah(name){
+ currentSurah=name;
+ $('surahList').classList.add('hidden');$('surahDetail').classList.remove('hidden');
+ $('surahTitle').textContent='سورة '+name;
+ const list=$('ayahList');list.innerHTML='';
+ surahs[name].forEach((a,i)=>{
+  const b=document.createElement('button');b.className='ayah';b.dataset.i=i;
+  b.textContent=ar(i+1)+'. '+a;list.appendChild(b);
+ });
+ list.onclick=e=>{const b=e.target.closest('button');if(b)readAyah(b)};
+}
+function readAyah(b){
+ document.querySelectorAll('.ayah').forEach(x=>x.classList.remove('correct'));
+ b.classList.add('correct');
+ speak(surahs[currentSurah][b.dataset.i]);addStars(2,'أحسنت في قراءة الآية!');
+}
+function readFullSurah(){speak(surahs[currentSurah].join(' '));addStars(5,'قرأت السورة كاملة!')}
+function closeSurah(){$('surahList').classList.remove('hidden');$('surahDetail').classList.add('hidden')}
+
+/* Memory game */
+let mem={cards:[],open:[],lock:false,moves:0,found:0};
+function startMemory(){
+ const pick=shuffle(letters).slice(0,6);
+ mem={cards:shuffle(pick.concat(pick).map(x=>({e:x[2],id:x[0],state:0}))),open:[],lock:false,moves:0,found:0};
+ renderMemory();
+}
+function renderMemory(){
+ const g=$('memGrid');g.innerHTML='';
+ mem.cards.forEach((c,i)=>{
+  const b=document.createElement('button');b.className='memcard'+(c.state===1?' open':c.state===2?' done':'');
+  b.dataset.i=i;b.textContent=c.state?c.e:'❓';g.appendChild(b);
+ });
+ $('memMoves').textContent=ar(mem.moves);
+ g.onclick=e=>{const b=e.target.closest('button');if(b)flip(+b.dataset.i)};
+}
+function flip(i){
+ const c=mem.cards[i];if(mem.lock||c.state!==0)return;
+ c.state=1;mem.open.push(i);renderMemory();
+ if(mem.open.length<2)return;
+ mem.moves++;mem.lock=true;
+ const [a,b]=mem.open.map(k=>mem.cards[k]);
+ setTimeout(()=>{
+  if(a.id===b.id){a.state=2;b.state=2;mem.found++;speak(a.id)}else{a.state=0;b.state=0}
+  mem.open=[];mem.lock=false;renderMemory();
+  if(mem.found===6){state.memWins++;addStars(15,'فزت باللعبة في '+ar(mem.moves)+' محاولات!')}
+ },700);
+}
+
+/* Quiz */
+function buildQuiz(){
+ const qs=[];
+ shuffle(letters).slice(0,4).forEach(x=>{
+  const wrong=shuffle(letters.filter(y=>y[0]!==x[0])).slice(0,2).map(y=>y[0]);
+  qs.push({q:'ما الحرف الذي تبدأ به كلمة '+x[1]+'؟',o:shuffle([x[0]].concat(wrong)),a:x[0]});
+ });
+ const a=1+Math.floor(Math.random()*5),b=1+Math.floor(Math.random()*5),sum=ar(a+b);
+ const opts=new Set([sum]);while(opts.size<3)opts.add(ar(1+Math.floor(Math.random()*10)));
+ qs.push({q:'كم يساوي '+ar(a)+' + '+ar(b)+'؟',o:shuffle([...opts]),a:sum});
+ shuffle(staticQuestions).slice(0,2).forEach(s=>qs.push({q:s.q,o:shuffle(s.o),a:s.a}));
+ return shuffle(qs);
+}
+function startQuiz(){quiz=buildQuiz();quizIndex=0;quizScore=0;showQuestion()}
+function showQuestion(){
+ if(quizIndex>=quiz.length){finishQuiz();return}
+ const q=quiz[quizIndex],box=$('quizBox');box.innerHTML='';
+ const h=document.createElement('h3');h.textContent=ar(quizIndex+1)+' من '+ar(quiz.length)+': '+q.q;box.appendChild(h);
+ q.o.forEach(o=>{
+  const b=document.createElement('button');b.className='question-option';b.textContent=o;
+  b.onclick=()=>answerQuestion(o,b);box.appendChild(b);
+ });
+}
+function answerQuestion(answer,button){
+ const q=quiz[quizIndex];
+ document.querySelectorAll('.question-option').forEach(x=>x.disabled=true);
+ if(answer===q.a){
+  button.classList.add('correct');quizScore++;state.correct++;speak('أحسنت');addStars(10,'إجابة صحيحة!');
+ }else{
+  button.classList.add('wrong');state.wrong++;state.mistakes.push(q.q+' ← '+q.a);
+  if(state.mistakes.length>40)state.mistakes=state.mistakes.slice(-40);
+  const ok=[...document.querySelectorAll('.question-option')].find(x=>x.textContent===q.a);
+  if(ok)ok.classList.add('correct');
+  saveState();updateAll();showNotice('الإجابة الصحيحة: '+q.a);
+ }
+ setTimeout(()=>{quizIndex++;showQuestion()},1000);
+}
+function finishQuiz(){
+ state.lastQuiz=ar(quizScore)+' من '+ar(quiz.length);
+ if(quizScore===quiz.length){state.perfect++;addStars(20,'نتيجة كاملة! مكافأة إضافية!')}else{saveState();updateAll()}
+ const box=$('quizBox');box.innerHTML='';
+ const h=document.createElement('h3');h.textContent='نتيجتك: '+state.lastQuiz+' 🎉';box.appendChild(h);
+ const b=document.createElement('button');b.textContent='إعادة الاختبار';b.onclick=startQuiz;box.appendChild(b);
+}
+function updateMistakes(){
+ const box=$('mistakesBox');box.innerHTML='';
+ if(!state.mistakes.length){box.textContent='لا توجد أخطاء مسجلة. أحسنت!';return}
+ [...new Set(state.mistakes)].slice(-8).forEach(x=>{const p=document.createElement('p');p.textContent='• '+x;box.appendChild(p)});
+}
+
+/* Badges */
+const badges=[
+ ['🌟','بطل الحروف',()=>state.activities>=5],
+ ['⭐','٥٠ نجمة',()=>state.stars>=50],
+ ['🏆','١٠٠ نجمة',()=>state.stars>=100],
+ ['🔥','متعلم مستمر',()=>state.streak>=3],
+ ['🧠','محترف الاختبارات',()=>state.perfect>=1],
+ ['✍️','فنان صغير',()=>state.drawings>=3],
+ ['📖','محب القرآن',()=>state.activities>=10],
+ ['🃏','بطل الذاكرة',()=>state.memWins>=1],
+ ['🎯','صاحب الهدف',()=>state.goalDate!==''],
+ ['👑','خبير',()=>state.stars>=200]
+];
+function updateBadges(){
+ const g=$('badgesGrid');g.innerHTML='';
+ badges.forEach(x=>{
+  const ok=x[2](),d=document.createElement('div');d.className='badge'+(ok?' unlocked':'');
+  d.innerHTML='<div style="font-size:42px"></div><b></b><br><small></small>';
+  d.children[0].textContent=x[0];d.children[1].textContent=x[1];d.children[3].textContent=ok?'مفتوحة ✅':'مغلقة 🔒';
+  g.appendChild(d);
+ });
+}
+
+/* Parents */
+function openParents(){
+ $('parentModal').style.display='flex';$('pinStep').classList.remove('hidden');$('parentData').classList.add('hidden');
+ $('pinInput').value='';
+ $('pinHint').textContent=state.pin==='1234'?'أدخل الرمز السري. الرمز الافتراضي: ١٢٣٤ (يمكنك تغييره بعد الدخول)':'أدخل الرمز السري.';
+}
+function closeModal(){$('parentModal').style.display='none'}
+function checkPin(){
+ if($('pinInput').value!==state.pin){showNotice('الرمز غير صحيح');return}
+ $('pinStep').classList.add('hidden');$('parentData').classList.remove('hidden');refreshParents();
+}
+function refreshParents(){
+ $('pName').textContent=state.name||'—';$('pStars').textContent=ar(state.stars);$('pActivities').textContent=ar(state.activities);
+ $('pQuiz').textContent=state.lastQuiz;$('pCorrect').textContent=ar(state.correct);$('pWrong').textContent=ar(state.wrong);$('pStreak').textContent=ar(state.streak);
+}
+function saveName(){state.name=$('newName').value.trim().slice(0,20);$('newName').value='';saveState();updateAll();refreshParents();showNotice('تم حفظ الاسم')}
+function savePin(){
+ const p=$('newPin').value.trim();
+ if(!/^\d{4,8}$/.test(p)){showNotice('الرمز يجب أن يكون من ٤ إلى ٨ أرقام');return}
+ state.pin=p;$('newPin').value='';saveState();showNotice('تم تغيير الرمز السري');
+}
+function resetProgress(){
+ if(!confirm('هل تريد حذف جميع بيانات التقدم؟'))return;
+ const keep={pin:state.pin};
+ state=Object.assign({},defaultState,keep,{lastDate:today(),streak:1,setup:false});
+ try{localStorage.removeItem('learningState')}catch(e){}
+ saveState();applyTheme();updateAll();closeModal();
+ $('nameInput').value='';$('ageScreen').style.display='flex';
+}
+function exportData(){
+ const json=JSON.stringify(state,null,2);
+ if(window.Android&&Android.share){Android.share('learning-progress.json',json);return}
+ const url=URL.createObjectURL(new Blob([json],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='learning-progress.json';a.click();URL.revokeObjectURL(url);
+}
+$('importFile').addEventListener('change',ev=>{
+ const f=ev.target.files[0];if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{
+  try{
+   const d=JSON.parse(r.result);
+   if(typeof d!=='object'||d===null||Array.isArray(d))throw 0;
+   const clean={};Object.keys(defaultState).forEach(k=>{if(k in d&&typeof d[k]===typeof defaultState[k])clean[k]=d[k]});
+   if(!Array.isArray(clean.mistakes))clean.mistakes=[];
+   if(!/^\d{4,8}$/.test(String(clean.pin||'')))delete clean.pin;
+   state=Object.assign({},defaultState,state,clean,{setup:true});
+   saveState();applyTheme();updateAll();closeModal();showNotice('تم استيراد التقدم بنجاح');
+  }catch(e){showNotice('الملف غير صالح')}
+  ev.target.value='';
+ };
+ r.readAsText(f);
+});
+
+/* Android back button */
+window.handleBack=function(){
+ if($('ageScreen').style.display==='flex')return true;
+ if($('parentModal').style.display==='flex'){closeModal();return true}
+ if(currentSection==='quran'&&!$('surahDetail').classList.contains('hidden')){closeSurah();return true}
+ if(currentSection!=='home'){showSection('home');return true}
+ return false;
+};
+
+function init(){
+ loadState();buildLetters();buildNumbers();buildSurahs();setupCanvas();
+ $('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)showSection(b.dataset.s)});
+ applyTheme();updateAll();newPrompt();
+ if(!state.setup)$('ageScreen').style.display='flex';
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

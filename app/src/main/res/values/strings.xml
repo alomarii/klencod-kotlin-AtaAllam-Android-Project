@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">أتعلم وأستمتع</string>
+    <string name="press_again">اضغط مرة أخرى للخروج</string>
+    <string name="share_title">مشاركة التقدم</string>
+    <string name="choose_file">اختر ملفًا</string>
+</resources>
